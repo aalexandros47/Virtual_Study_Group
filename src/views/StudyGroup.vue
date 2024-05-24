@@ -119,7 +119,7 @@ export default {
       }
     },
     initializePeer() {
-      this.socket = io('https://your-socket-server'); // Replace with your socket server URL
+      this.socket = io('https://your-socket-server-url'); // Replace with your socket server URL
       this.myPeer = new SimplePeer({
         initiator: location.hash === '#init',
         trickle: false,
