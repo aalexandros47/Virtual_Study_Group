@@ -1,3 +1,5 @@
+// Entry point of the Vue.js application, sets up the Vue instance, router, and store
+
 import { createApp } from 'vue';
 import App from './App.vue';
 import router from './router';

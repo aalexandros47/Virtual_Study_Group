@@ -1,3 +1,5 @@
+<!-- Login page view that handles user authentication. -->
+
 <template>
   <div
     class="login-page min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-500 to-purple-600"

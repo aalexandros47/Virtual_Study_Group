@@ -1,10 +1,15 @@
+<!-- Component for filtering and searching study groups. -->
+
+<!-- This component provides a search and filter functionality for study groups. Users can search for specific study groups based on keywords, helping them quickly find relevant groups to join. -->
+
 <template>
   <div class="search-filter">
     <input
       type="text"
       v-model="searchQuery"
-      @input="filterGroups"
       placeholder="Search study groups..."
+      @input="filterGroups"
+      class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
     />
   </div>
 </template>
@@ -19,7 +24,7 @@ export default {
   },
   methods: {
     filterGroups() {
-      this.$store.dispatch('filterStudyGroups', this.searchQuery);
+      this.$emit('filter', this.searchQuery);
     },
   },
 };
@@ -27,12 +32,6 @@ export default {
 
 <style scoped>
 .search-filter {
-  margin-bottom: 1em;
-}
-input {
-  width: 100%;
-  padding: 0.5em;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  margin-bottom: 2em;
 }
 </style>

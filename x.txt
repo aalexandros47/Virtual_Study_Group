@@ -1,0 +1,46 @@
+How the Project Meets the Requirements
+
+Responsive Design:
+
+Files: All .vue files (e.g., HomeView.vue, StudyGroups.vue, CreateStudyGroup.vue)
+Explanation: The project uses responsive design principles and CSS, including Flexbox and CSS Grid, to ensure the layout adapts to different screen sizes.
+VueJS Components, Routers, and Custom Directives:
+
+Files: src/main.js, src/router/index.js, all components and views.
+Explanation: The project uses VueJS components for modularity, Vue Router for navigation, and Vuex for state management.
+Arrays for Dynamic Data Handling:
+
+Files: src/store/index.js, StudyGroups.vue, StudyGroup.vue
+Explanation: Arrays are used to handle lists of study groups, and state management is handled through Vuex to ensure dynamic updates.
+Core VueJS Directives:
+
+Files: All .vue files.
+Explanation: Core directives like v-bind, v-model, v-if, v-for, and v-on are used throughout the components to create interactive and reactive UIs.
+Forms with Data Validation:
+
+Files: LoginView.vue, RegisterView.vue, CreateStudyGroup.vue
+Explanation: Forms use v-model for two-way data binding, and HTML5 validation attributes to ensure proper data input.
+Mobile-First Approach:
+
+Files: All .vue files.
+Explanation: CSS and layout design follow a mobile-first approach, ensuring the application is fully responsive across different device sizes.
+Accessibility:
+
+Files: All .vue files.
+Explanation: Input forms and tables are designed with accessibility in mind, using proper HTML elements and attributes.
+HTML5 Coding Conventions:
+
+Files: All .vue files.
+Explanation: The project adheres to HTML5 coding conventions, including proper case usage and indentation for readability and professionalism.
+User Registration, Login, and Content Visibility:
+
+Files: src/store/index.js, LoginView.vue, RegisterView.vue, AppNavbar.vue
+Explanation: The project implements user registration and login using Firebase Authentication, with conditional rendering based on user authentication status.
+Search and Filters:
+
+Files: StudyGroups.vue
+Explanation: The project includes capabilities for users to search for content and use filters to refine results.
+Social Functionalities (Liking/Voting):
+
+Files: StudyGroups.vue
+Explanation: Users can like or vote on study groups, demonstrating social functionalities.

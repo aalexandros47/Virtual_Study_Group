@@ -1,3 +1,5 @@
+// Manages routing between different views, ensures restricted access to authenticated users.
+
 import { createRouter, createWebHistory } from 'vue-router';
 import HomeView from '../views/HomeView.vue';
 import StudyGroups from '../views/StudyGroups.vue';

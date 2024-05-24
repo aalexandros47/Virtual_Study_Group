@@ -1,3 +1,5 @@
+<!-- This component provides a discussion board where users can post messages within a study group. It enables real-time communication through Firestore, allowing members of the study group to see and post messages. -->
+
 <template>
   <div class="discussion-board">
     <h3 class="text-2xl font-bold mb-4">Discussion</h3>

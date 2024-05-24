@@ -1,3 +1,7 @@
+<!-- Navigation bar component that shows different links based on authentication state. -->
+
+<!-- This component provides the navigation bar for the application. It shows different navigation links based on the user's authentication status. For authenticated users, it displays links to create a study group, view study groups, and log out. For unauthenticated users, it displays links to log in and register. -->
+
 <template>
   <nav class="bg-blue-600 p-4 text-white">
     <div class="container mx-auto flex justify-between">

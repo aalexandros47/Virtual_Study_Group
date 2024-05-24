@@ -1,3 +1,5 @@
+<!-- Registration page view that handles new user registration. -->
+
 <template>
   <div
     class="register-page min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-500 to-purple-600"

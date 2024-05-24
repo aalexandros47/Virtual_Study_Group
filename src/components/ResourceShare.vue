@@ -1,3 +1,7 @@
+<!-- This component allows users to share resources (e.g., links, documents) within a
+study group. It enables users to post and view shared resources, facilitating
+collaboration and resource sharing among group members. -->
+
 <template>
   <div class="resource-share">
     <h3 class="text-2xl font-bold mb-4">Resources</h3>

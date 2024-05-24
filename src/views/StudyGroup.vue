@@ -1,3 +1,6 @@
+<!-- Page for creating new study groups. -->
+<!-- Detailed view for a specific study group, including video, discussion, and resource sharing functionalities. -->
+
 <template>
   <div
     class="study-group-page bg-white shadow-lg rounded-lg p-8 m-4 max-w-4xl mx-auto"
