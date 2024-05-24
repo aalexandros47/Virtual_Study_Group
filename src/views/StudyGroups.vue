@@ -3,7 +3,7 @@
     <h2 class="text-3xl font-bold mb-4">Study Groups</h2>
     <SearchFilter />
     <div
-      v-for="group in filteredStudyGroups"
+      v-for="group in studyGroups"
       :key="group.id"
       class="study-group bg-white shadow-lg rounded-lg p-6 mb-6"
     >
@@ -40,17 +40,14 @@ export default {
     SearchFilter,
   },
   computed: {
-    filteredStudyGroups() {
-      return this.$store.state.filteredStudyGroups;
+    studyGroups() {
+      return this.$store.state.studyGroups;
     },
     authMessage() {
       return this.$store.state.authMessage;
     },
     authError() {
       return this.$store.state.authError;
-    },
-    isAuthenticated() {
-      return this.$store.state.user;
     },
   },
   methods: {
@@ -59,8 +56,6 @@ export default {
     },
   },
   created() {
-    this.$store.commit('setAuthMessage', null);
-    this.$store.commit('setAuthError', null);
     this.$store.dispatch('fetchStudyGroups');
   },
 };
