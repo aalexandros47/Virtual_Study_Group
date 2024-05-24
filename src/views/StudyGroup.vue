@@ -25,10 +25,11 @@
     </div>
     <div v-if="selectedTab === 'video'" class="video-container mb-4">
       <div class="video-grid">
+        <video ref="myVideo" class="video-element" autoplay playsinline></video>
         <video
-          v-for="(stream, index) in videoStreams"
+          v-for="(stream, index) in remoteStreams"
           :key="index"
-          :id="'video-' + index"
+          :ref="'remoteVideo' + index"
           class="video-element"
           autoplay
           playsinline
@@ -57,9 +58,11 @@
 </template>
 
 <script>
+import { db } from '../firebase';
+import { io } from 'socket.io-client';
+import SimplePeer from 'simple-peer';
 import DiscussionBoard from '../components/DiscussionBoard.vue';
 import ResourceShare from '../components/ResourceShare.vue';
-import { db } from '../firebase';
 
 export default {
   name: 'StudyGroup',
@@ -72,9 +75,11 @@ export default {
       groupId: this.$route.params.id,
       studyGroup: {},
       selectedTab: 'video',
+      socket: null,
+      myPeer: null,
       videoStream: null,
       audioStream: null,
-      videoStreams: [], // Store multiple video streams
+      remoteStreams: [],
     };
   },
   methods: {
@@ -87,16 +92,14 @@ export default {
           this.videoStream = await navigator.mediaDevices.getUserMedia({
             video: true,
           });
-          this.videoStreams.push(this.videoStream);
-          this.updateVideoGrid();
+          this.$refs.myVideo.srcObject = this.videoStream;
+          this.initializePeer();
         } catch (error) {
           console.error('Error accessing camera:', error);
         }
       } else {
-        this.videoStreams.forEach((stream) =>
-          stream.getTracks().forEach((track) => track.stop())
-        );
-        this.videoStreams = [];
+        this.videoStream.getTracks().forEach((track) => track.stop());
+        this.videoStream = null;
       }
     },
     async toggleMicrophone() {
@@ -115,14 +118,24 @@ export default {
         this.audioStream = null;
       }
     },
-    updateVideoGrid() {
-      this.$nextTick(() => {
-        this.videoStreams.forEach((stream, index) => {
-          const videoElement = document.getElementById('video-' + index);
-          if (videoElement) {
-            videoElement.srcObject = stream;
-          }
-        });
+    initializePeer() {
+      this.socket = io('https://your-socket-server'); // Replace with your socket server URL
+      this.myPeer = new SimplePeer({
+        initiator: location.hash === '#init',
+        trickle: false,
+        stream: this.videoStream,
+      });
+
+      this.myPeer.on('signal', (data) => {
+        this.socket.emit('signal', data);
+      });
+
+      this.myPeer.on('stream', (stream) => {
+        this.remoteStreams.push(stream);
+      });
+
+      this.socket.on('signal', (data) => {
+        this.myPeer.signal(data);
       });
     },
     async fetchStudyGroup() {
