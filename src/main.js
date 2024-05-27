@@ -2,8 +2,8 @@
 
 import { createApp } from 'vue';
 import MainApp from './MainApp.vue';
-import router from './router'; // Ensure these paths are correct
-import store from './store'; // Ensure these paths are correct
-import './assets/styles.css'; // Ensure the path is correct
+import router from './router';
+import store from './store';
+import './assets/styles.css';
 
-createApp(MainApp).use(store).use(router).mount('#root'); // Ensure the selector matches the div in index.html
+createApp(MainApp).use(store).use(router).mount('#root');
