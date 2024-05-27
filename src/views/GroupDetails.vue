@@ -1,36 +1,39 @@
-<!-- Page for creating new study groups. -->
-<!-- Detailed view for a specific study group, including video, discussion, and resource sharing functionalities. -->
-
+<!-- Detailed view for a specific study group, including video, discussion, and resource sharing functionalities -->
 <template>
   <div
-    class="study-group-page bg-white shadow-lg rounded-lg p-8 m-4 max-w-4xl mx-auto"
+    class="group-details-page bg-white shadow-lg rounded-lg p-8 m-4 max-w-4xl mx-auto"
   >
-    <h2 class="text-3xl font-bold mb-4">{{ studyGroup.name }}</h2>
+    <h2 class="text-3xl font-bold mb-4">{{ group.name }}</h2>
     <div class="tabs">
       <button
-        @click="selectTab('video')"
-        :class="{ 'active-tab': selectedTab === 'video' }"
+        @click="setTab('video')"
+        :class="{ 'active-tab': activeTab === 'video' }"
       >
         Video
       </button>
       <button
-        @click="selectTab('discussion')"
-        :class="{ 'active-tab': selectedTab === 'discussion' }"
+        @click="setTab('discussion')"
+        :class="{ 'active-tab': activeTab === 'discussion' }"
       >
         Discussion
       </button>
       <button
-        @click="selectTab('resources')"
-        :class="{ 'active-tab': selectedTab === 'resources' }"
+        @click="setTab('resources')"
+        :class="{ 'active-tab': activeTab === 'resources' }"
       >
         Resources
       </button>
     </div>
-    <div v-if="selectedTab === 'video'" class="video-container mb-4">
+    <div v-if="activeTab === 'video'" class="video-container mb-4">
       <div class="video-grid">
-        <video ref="myVideo" class="video-element" autoplay playsinline></video>
         <video
-          v-for="(stream, index) in remoteStreams"
+          ref="localVideo"
+          class="video-element"
+          autoplay
+          playsinline
+        ></video>
+        <video
+          v-for="(stream, index) in remoteVideoStreams"
           :key="index"
           :ref="'remoteVideo' + index"
           class="video-element"
@@ -51,11 +54,11 @@
         Toggle Microphone
       </button>
     </div>
-    <div v-if="selectedTab === 'discussion'" class="discussion-container">
-      <DiscussionBoard :studyGroupId="groupId" />
+    <div v-if="activeTab === 'discussion'" class="discussion-container">
+      <DiscussionBoard :groupId="groupId" />
     </div>
-    <div v-if="selectedTab === 'resources'" class="resources-container">
-      <ResourceShare :studyGroupId="groupId" />
+    <div v-if="activeTab === 'resources'" class="resources-container">
+      <ResourceShare :groupId="groupId" />
     </div>
   </div>
 </template>
@@ -68,7 +71,7 @@ import DiscussionBoard from '../components/DiscussionBoard.vue';
 import ResourceShare from '../components/ResourceShare.vue';
 
 export default {
-  name: 'StudyGroup',
+  name: 'GroupDetails',
   components: {
     DiscussionBoard,
     ResourceShare,
@@ -76,18 +79,18 @@ export default {
   data() {
     return {
       groupId: this.$route.params.id,
-      studyGroup: {},
-      selectedTab: 'video',
+      group: {},
+      activeTab: 'video',
       socket: null,
-      myPeer: null,
+      peerConnection: null,
       videoStream: null,
       audioStream: null,
-      remoteStreams: [],
+      remoteVideoStreams: [],
     };
   },
   methods: {
-    selectTab(tab) {
-      this.selectedTab = tab;
+    setTab(tab) {
+      this.activeTab = tab;
     },
     async toggleCamera() {
       if (!this.videoStream) {
@@ -95,8 +98,8 @@ export default {
           this.videoStream = await navigator.mediaDevices.getUserMedia({
             video: true,
           });
-          this.$refs.myVideo.srcObject = this.videoStream;
-          this.initializePeer();
+          this.$refs.localVideo.srcObject = this.videoStream;
+          this.initializePeerConnection();
         } catch (error) {
           console.error('Error accessing camera:', error);
         }
@@ -121,46 +124,43 @@ export default {
         this.audioStream = null;
       }
     },
-    initializePeer() {
+    initializePeerConnection() {
       this.socket = io('https://your-socket-server-url'); // Replace with your socket server URL
-      this.myPeer = new SimplePeer({
+      this.peerConnection = new SimplePeer({
         initiator: location.hash === '#init',
         trickle: false,
         stream: this.videoStream,
       });
 
-      this.myPeer.on('signal', (data) => {
+      this.peerConnection.on('signal', (data) => {
         this.socket.emit('signal', data);
       });
 
-      this.myPeer.on('stream', (stream) => {
-        this.remoteStreams.push(stream);
+      this.peerConnection.on('stream', (stream) => {
+        this.remoteVideoStreams.push(stream);
       });
 
       this.socket.on('signal', (data) => {
-        this.myPeer.signal(data);
+        this.peerConnection.signal(data);
       });
     },
-    async fetchStudyGroup() {
+    async fetchGroupDetails() {
       try {
-        const groupDoc = await db
-          .collection('studyGroups')
-          .doc(this.groupId)
-          .get();
-        this.studyGroup = groupDoc.data();
+        const groupDoc = await db.collection('groups').doc(this.groupId).get();
+        this.group = groupDoc.data();
       } catch (error) {
-        console.error('Error fetching study group:', error);
+        console.error('Error fetching group details:', error);
       }
     },
   },
   created() {
-    this.fetchStudyGroup();
+    this.fetchGroupDetails();
   },
 };
 </script>
 
 <style scoped>
-.study-group-page {
+.group-details-page {
   display: flex;
   flex-direction: column;
   align-items: center;

@@ -1,73 +1,93 @@
+// Vuex store to manage global state, handles user authentication and study group data.
+
 import { createStore } from 'vuex';
 import { auth, db } from '../firebase';
 import firebase from 'firebase/compat/app';
 
 export default createStore({
   state: {
-    user: null,
-    studyGroups: [],
-    authError: null,
-    authMessage: null,
+    currentUser: null,
+    groups: [],
+    authMsg: null,
+    errorMsg: null,
   },
   mutations: {
-    setUser(state, user) {
-      state.user = user;
+    setCurrentUser(state, user) {
+      state.currentUser = user;
     },
-    setStudyGroups(state, studyGroups) {
-      state.studyGroups = studyGroups;
+    setGroups(state, groups) {
+      state.groups = groups;
     },
-    setAuthError(state, error) {
-      state.authError = error;
+    setAuthMsg(state, msg) {
+      state.authMsg = msg;
     },
-    setAuthMessage(state, message) {
-      state.authMessage = message;
+    setErrorMsg(state, msg) {
+      state.errorMsg = msg;
     },
   },
   actions: {
-    async fetchStudyGroups({ commit }) {
+    async fetchGroups({ commit }) {
       try {
-        const snapshot = await db.collection('studyGroups').get();
-        const studyGroups = snapshot.docs.map((doc) => ({
+        const snapshot = await db.collection('groups').get();
+        const groups = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
-        commit('setStudyGroups', studyGroups);
+        commit('setGroups', groups);
       } catch (error) {
-        console.error('Error fetching study groups:', error);
+        console.error('Error fetching groups:', error);
       }
     },
-    async createStudyGroup({ commit, state }, studyGroup) {
+    async createGroup({ commit, state }, groupData) {
       try {
-        const expirationDate = new Date();
-        expirationDate.setHours(
-          expirationDate.getHours() + studyGroup.duration
-        ); // Assuming duration is in hours
+        const expiryDate = new Date();
+        expiryDate.setHours(expiryDate.getHours() + groupData.duration);
 
         const newGroup = {
-          ...studyGroup,
-          members: [state.user.uid],
-          createdBy: state.user.uid,
-          expirationDate,
+          ...groupData,
+          members: [state.currentUser.uid],
+          createdBy: state.currentUser.uid,
+          expiryDate,
+          likes: 0,
         };
-        await db.collection('studyGroups').add(newGroup);
-        commit('setAuthMessage', 'Study group created successfully!');
-        this.dispatch('fetchStudyGroups'); // Fetch study groups after creating a new one
+        await db.collection('groups').add(newGroup);
+        commit('setAuthMsg', 'Group created successfully!');
+        this.dispatch('fetchGroups');
       } catch (error) {
-        commit('setAuthError', error.message);
-        console.error('Error creating study group:', error);
+        commit('setErrorMsg', error.message);
+        console.error('Error creating group:', error);
       }
     },
-    async joinStudyGroup({ commit, state }, groupId) {
+    async joinGroup({ state }, groupId) {
       try {
-        const groupRef = db.collection('studyGroups').doc(groupId);
+        const groupRef = db.collection('groups').doc(groupId);
         await groupRef.update({
-          members: firebase.firestore.FieldValue.arrayUnion(state.user.uid),
+          members: firebase.firestore.FieldValue.arrayUnion(
+            state.currentUser.uid
+          ),
         });
-        commit('setAuthMessage', 'Successfully joined the study group!');
-        this.dispatch('fetchStudyGroups'); // Fetch study groups after joining a group
+        this.dispatch('fetchGroups');
       } catch (error) {
-        commit('setAuthError', error.message);
-        console.error('Error joining study group:', error);
+        console.error('Error joining group:', error);
+      }
+    },
+    async likeGroup({ dispatch }, groupId) {
+      try {
+        const groupRef = db.collection('groups').doc(groupId);
+        const groupDoc = await groupRef.get();
+        const currentLikes = groupDoc.data().likes || 0;
+        await groupRef.update({ likes: currentLikes + 1 });
+        dispatch('fetchGroups');
+      } catch (error) {
+        console.error('Error liking group:', error);
+      }
+    },
+    async deleteGroup({ dispatch }, groupId) {
+      try {
+        await db.collection('groups').doc(groupId).delete();
+        dispatch('fetchGroups');
+      } catch (error) {
+        console.error('Error deleting group:', error);
       }
     },
     async login({ commit }, { email, password }) {
@@ -76,40 +96,40 @@ export default createStore({
           email,
           password
         );
-        commit('setUser', userCredential.user);
-        commit('setAuthMessage', 'Login successful!');
-        commit('setAuthError', null);
-        this.dispatch('fetchStudyGroups'); // Fetch study groups after login
+        commit('setCurrentUser', userCredential.user);
+        commit('setAuthMsg', 'Login successful!');
+        commit('setErrorMsg', null);
+        this.dispatch('fetchGroups');
       } catch (error) {
-        commit('setAuthError', error.message);
-        commit('setAuthMessage', null);
+        commit('setErrorMsg', error.message);
+        commit('setAuthMsg', null);
         console.error('Error logging in:', error);
       }
     },
-    async register({ commit }, { email, password }) {
+    async signup({ commit }, { email, password }) {
       try {
         const userCredential = await auth.createUserWithEmailAndPassword(
           email,
           password
         );
-        commit('setUser', userCredential.user);
-        commit('setAuthMessage', 'Registration successful! Please log in.');
-        commit('setAuthError', null);
+        commit('setCurrentUser', userCredential.user);
+        commit('setAuthMsg', 'Registration successful! Please log in.');
+        commit('setErrorMsg', null);
       } catch (error) {
-        commit('setAuthError', error.message);
-        commit('setAuthMessage', null);
+        commit('setErrorMsg', error.message);
+        commit('setAuthMsg', null);
         console.error('Error registering:', error);
       }
     },
     async logout({ commit }) {
       try {
         await auth.signOut();
-        commit('setUser', null);
-        commit('setAuthMessage', 'Logout successful!');
-        commit('setAuthError', null);
+        commit('setCurrentUser', null);
+        commit('setAuthMsg', 'Logout successful!');
+        commit('setErrorMsg', null);
       } catch (error) {
-        commit('setAuthError', error.message);
-        commit('setAuthMessage', null);
+        commit('setErrorMsg', error.message);
+        commit('setAuthMsg', null);
         console.error('Error logging out:', error);
       }
     },

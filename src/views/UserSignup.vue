@@ -1,18 +1,19 @@
-<!-- Login page view that handles user authentication. -->
-
+<!-- Registration page view that handles new user registration. -->
 <template>
   <div
-    class="login-page min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-500 to-purple-600"
+    class="signup-page flex items-center justify-center min-h-screen bg-gray-50"
   >
-    <div class="bg-white shadow-md rounded-lg p-8 m-4 max-w-sm w-full">
-      <h2 class="text-2xl font-bold mb-4">Login</h2>
-      <form @submit.prevent="submit">
+    <div
+      class="bg-white shadow-md rounded-lg p-8 m-4 max-w-sm w-full animate-fade-in"
+    >
+      <h2 class="text-2xl font-bold mb-4">Sign Up</h2>
+      <form @submit.prevent="handleSignup">
         <div class="mb-4">
           <label for="email" class="block text-gray-700">Email:</label>
           <input
             type="email"
             id="email"
-            v-model="email"
+            v-model="newEmail"
             required
             class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
           />
@@ -22,7 +23,7 @@
           <input
             type="password"
             id="password"
-            v-model="password"
+            v-model="newPassword"
             required
             class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
           />
@@ -31,14 +32,14 @@
           type="submit"
           class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full transition duration-300"
         >
-          Login
+          Sign Up
         </button>
       </form>
-      <div v-if="authMessage" class="auth-message mt-4 text-green-500">
-        {{ authMessage }}
+      <div v-if="authMsg" class="auth-message mt-4 text-green-500">
+        {{ authMsg }}
       </div>
-      <div v-if="authError" class="auth-error mt-4 text-red-500">
-        {{ authError }}
+      <div v-if="errorMsg" class="auth-error mt-4 text-red-500">
+        {{ errorMsg }}
       </div>
     </div>
   </div>
@@ -46,31 +47,31 @@
 
 <script>
 export default {
-  name: 'LoginView',
+  name: 'SignupView',
   data() {
     return {
-      email: '',
-      password: '',
+      newEmail: '',
+      newPassword: '',
     };
   },
   computed: {
-    authMessage() {
-      return this.$store.state.authMessage;
+    authMsg() {
+      return this.$store.state.authMsg;
     },
-    authError() {
-      return this.$store.state.authError;
+    errorMsg() {
+      return this.$store.state.errorMsg;
     },
   },
   methods: {
-    submit() {
+    handleSignup() {
       this.$store
-        .dispatch('login', {
-          email: this.email,
-          password: this.password,
+        .dispatch('signup', {
+          email: this.newEmail,
+          password: this.newPassword,
         })
         .then(() => {
-          if (!this.authError) {
-            this.$router.push('/create-study-group');
+          if (!this.errorMsg) {
+            this.$router.push('/login');
           }
         });
     },
@@ -79,13 +80,30 @@ export default {
 </script>
 
 <style scoped>
-.login-page {
-  background: linear-gradient(to right, #4a90e2, #50b7f5);
+.signup-page {
+  background-color: #f8f9fa;
 }
+
 .auth-message {
   color: green;
 }
+
 .auth-error {
   color: red;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-in-out;
 }
 </style>

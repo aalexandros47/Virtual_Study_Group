@@ -1,34 +1,33 @@
 // Manages routing between different views, ensures restricted access to authenticated users.
-
 import { createRouter, createWebHistory } from 'vue-router';
-import HomeView from '../views/HomeView.vue';
-import StudyGroups from '../views/StudyGroups.vue';
-import StudyGroup from '../views/StudyGroup.vue';
-import LoginView from '../views/LoginView.vue';
-import RegisterView from '../views/RegisterView.vue';
-import CreateStudyGroup from '../components/CreateStudyGroup.vue';
+import LandingPage from '../views/LandingPage.vue';
+import GroupList from '../views/GroupList.vue';
+import GroupDetails from '../views/GroupDetails.vue';
+import UserLogin from '../views/UserLogin.vue';
+import UserSignup from '../views/UserSignup.vue';
+import CreateGroup from '../views/CreateGroup.vue';
 import { auth } from '../firebase';
 
 const routes = [
-  { path: '/', name: 'Home', component: HomeView },
+  { path: '/', name: 'Landing', component: LandingPage },
   {
-    path: '/study-groups',
-    name: 'StudyGroups',
-    component: StudyGroups,
+    path: '/groups',
+    name: 'Groups',
+    component: GroupList,
     meta: { requiresAuth: true },
   },
   {
-    path: '/study-group/:id',
-    name: 'StudyGroup',
-    component: StudyGroup,
+    path: '/group/:id',
+    name: 'Group',
+    component: GroupDetails,
     meta: { requiresAuth: true },
   },
-  { path: '/login', name: 'Login', component: LoginView },
-  { path: '/register', name: 'Register', component: RegisterView },
+  { path: '/login', name: 'Login', component: UserLogin },
+  { path: '/signup', name: 'Signup', component: UserSignup },
   {
-    path: '/create-study-group',
-    name: 'CreateStudyGroup',
-    component: CreateStudyGroup,
+    path: '/create-group',
+    name: 'CreateGroup',
+    component: CreateGroup,
     meta: { requiresAuth: true },
   },
 ];
@@ -40,9 +39,9 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
-  const isAuthenticated = auth.currentUser;
+  const userAuthenticated = auth.currentUser;
 
-  if (requiresAuth && !isAuthenticated) {
+  if (requiresAuth && !userAuthenticated) {
     next('/login');
   } else {
     next();

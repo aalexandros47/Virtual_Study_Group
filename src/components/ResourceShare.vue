@@ -5,38 +5,28 @@ collaboration and resource sharing among group members. -->
 <template>
   <div class="resource-share">
     <h3 class="text-2xl font-bold mb-4">Resources</h3>
-    <div class="resources mb-4">
-      <div
-        v-for="resource in resources"
-        :key="resource.id"
-        class="resource bg-gray-200 p-2 rounded-lg mb-2"
-      >
-        <a
-          :href="resource.url"
-          target="_blank"
-          class="font-bold text-blue-500"
-          >{{ resource.name }}</a
-        >
-      </div>
+    <div
+      v-for="resource in resources"
+      :key="resource.id"
+      class="resource bg-gray-200 p-4 rounded-lg mb-2"
+    >
+      <p>
+        <strong>{{ resource.user }}</strong
+        >: <a :href="resource.link" target="_blank">{{ resource.link }}</a>
+      </p>
     </div>
-    <form @submit.prevent="postResource" class="resource-form">
+    <form @submit.prevent="shareResource">
       <input
         type="text"
-        v-model="newResourceName"
-        placeholder="Resource name"
-        class="w-full p-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-blue-600"
-      />
-      <input
-        type="url"
-        v-model="newResourceUrl"
-        placeholder="Resource URL"
-        class="w-full p-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-blue-600"
+        v-model="newResource"
+        placeholder="Share a resource link..."
+        class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
       />
       <button
         type="submit"
-        class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full transition duration-300"
+        class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full transition duration-300 mt-2"
       >
-        Update Resource
+        Share
       </button>
     </form>
   </div>
@@ -44,47 +34,38 @@ collaboration and resource sharing among group members. -->
 
 <script>
 import { db } from '../firebase';
-import firebase from 'firebase/compat/app'; // Ensure firebase is imported
 
 export default {
   name: 'ResourceShare',
   props: {
-    studyGroupId: String,
+    groupId: String,
   },
   data() {
     return {
-      newResourceName: '',
-      newResourceUrl: '',
       resources: [],
+      newResource: '',
     };
   },
   methods: {
-    async postResource() {
-      if (
-        this.newResourceName.trim() === '' ||
-        this.newResourceUrl.trim() === ''
-      )
-        return;
+    async shareResource() {
+      if (this.newResource.trim() === '') return;
+
       const resource = {
-        name: this.newResourceName,
-        url: this.newResourceUrl,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        user: this.$store.state.currentUser.email,
+        link: this.newResource,
+        timestamp: new Date(),
       };
-      try {
-        await db
-          .collection('studyGroups')
-          .doc(this.studyGroupId)
-          .collection('resources')
-          .add(resource);
-        this.newResourceName = '';
-        this.newResourceUrl = '';
-      } catch (error) {
-        console.error('Error posting resource:', error);
-      }
+
+      await db
+        .collection('groups')
+        .doc(this.groupId)
+        .collection('resources')
+        .add(resource);
+      this.newResource = '';
     },
     fetchResources() {
-      db.collection('studyGroups')
-        .doc(this.studyGroupId)
+      db.collection('groups')
+        .doc(this.groupId)
         .collection('resources')
         .orderBy('timestamp')
         .onSnapshot((snapshot) => {
@@ -103,28 +84,9 @@ export default {
 
 <style scoped>
 .resource-share {
-  max-width: 600px;
-  margin: 0 auto;
+  margin-top: 2em;
 }
-
-.resource-form {
-  display: flex;
-  flex-direction: column;
-}
-
 .resource {
-  padding: 1em;
-  border-radius: 8px;
-  background-color: #f0f0f0;
   margin-bottom: 1em;
-}
-
-.resource a {
-  color: #007bff;
-  text-decoration: none;
-}
-
-.resource a:hover {
-  text-decoration: underline;
 }
 </style>
