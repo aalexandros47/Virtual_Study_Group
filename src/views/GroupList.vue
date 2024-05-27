@@ -3,7 +3,7 @@
     <h2 class="text-3xl font-bold mb-4">Study Groups</h2>
     <SearchFilter @filter="filterGroups" />
     <div
-      v-for="group in filteredGroups"
+      v-for="group in paginatedGroups"
       :key="group.id"
       class="group-item bg-white shadow-lg rounded-lg p-6 mb-6 animate-fade-in"
     >
@@ -30,6 +30,11 @@
         Delete
       </button>
     </div>
+    <GroupPagination
+      :totalItems="filteredGroups.length"
+      :itemsPerPage="itemsPerPage"
+      @page-changed="handlePageChange"
+    />
     <div v-if="authMsg" class="auth-message text-green-500">{{ authMsg }}</div>
     <div v-if="errorMsg" class="auth-error text-red-500">{{ errorMsg }}</div>
   </div>
@@ -37,15 +42,19 @@
 
 <script>
 import SearchFilter from '../components/SearchFilter.vue';
+import GroupPagination from '../components/GroupPagination.vue';
 
 export default {
   name: 'GroupList',
   components: {
     SearchFilter,
+    GroupPagination,
   },
   data() {
     return {
       searchQuery: '',
+      currentPage: 1,
+      itemsPerPage: 10, // Changed to 10 items per page
     };
   },
   computed: {
@@ -60,6 +69,11 @@ export default {
             .toLowerCase()
             .includes(this.searchQuery.toLowerCase())
       );
+    },
+    paginatedGroups() {
+      const start = (this.currentPage - 1) * this.itemsPerPage;
+      const end = start + this.itemsPerPage;
+      return this.filteredGroups.slice(start, end);
     },
     authMsg() {
       return this.$store.state.authMsg;
@@ -77,6 +91,9 @@ export default {
     },
     deleteGroup(groupId) {
       this.$store.dispatch('deleteGroup', groupId);
+    },
+    handlePageChange(page) {
+      this.currentPage = page;
     },
   },
   created() {
