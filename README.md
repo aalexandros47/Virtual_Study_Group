@@ -45,8 +45,7 @@ The Virtual Study Group Platform is a web application designed to facilitate the
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/aalexandros47
-/virtual-study-group-platform.git
+   git clone https://github.com/aalexandros47/virtual-study-group-platform.git
    ```
 
 2. Navigate to the project directory:
