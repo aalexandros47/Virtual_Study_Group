@@ -1,5 +1,3 @@
-### README: Virtual Study Group Platform
-
 # Virtual Study Group Platform
 
 The Virtual Study Group Platform is a web application designed to facilitate the creation, management, and participation in online study groups. This platform allows users to create, join, and manage study groups, share resources, and engage in real-time discussions with peers. The application is built using Vue.js, Tailwind CSS, Firebase Authentication, and Firebase Firestore.
@@ -117,34 +115,6 @@ virtual-study-group-platform/
 ├── package-lock.json
 └── package.json
 ```
-
-## Screenshots
-
-Include screenshots to help users understand the application.
-
-1. **User Registration Page:**
-   ![User Registration](screenshots/registration.png)
-
-2. **User Login Page:**
-   ![User Login](screenshots/login.png)
-
-3. **Dashboard with Study Groups:**
-   ![Study Groups](screenshots/study-groups.png)
-
-4. **Create Study Group Page:**
-   ![Create Study Group](screenshots/create-group.png)
-
-5. **Discussion Board:**
-   ![Discussion Board](screenshots/discussion-board.png)
-
-6. **Resource Sharing:**
-   ![Resource Sharing](screenshots/resource-sharing.png)
-
-7. **Real-Time Interaction:**
-   ![Real-Time Interaction](screenshots/real-time-interaction.png)
-
-8. **Like and Delete Group:**
-   ![Like and Delete Group](screenshots/like-delete-group.png)
 
 ## Technical Details
 
