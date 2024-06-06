@@ -151,6 +151,3 @@ Contributions are welcome! Please follow these steps:
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
----
-
-This README file provides a comprehensive guide to the Virtual Study Group Platform, ensuring that users can easily understand how to install, use, and contribute to the project.
